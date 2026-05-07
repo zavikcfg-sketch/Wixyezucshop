@@ -11,39 +11,9 @@ import os
 import sys
 from pathlib import Path
 
-from aiogram import Bot, Dispatcher, F
-from aiogram.exceptions import TelegramAPIError, TelegramNetworkError
-from aiogram.client.default import DefaultBotProperties
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import CallbackQuery, FSInputFile, Message
-
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-from bot.keyboards import (  # noqa: E402
-    inline_pay_url,
-    inline_product_list,
-    inline_root_menu,
-    reply_cancel_only,
-    reply_main_menu,
-)
-from shared.catalog import (  # noqa: E402
-    OTHER_GAMES,
-    PUBG_UC_PRODUCTS,
-    TELEGRAM_GOODS,
-    VPN_SERVICE,
-    get_product,
-)
-from shared.config import get_settings  # noqa: E402
-from shared.paycore import (  # noqa: E402
-    PayCoreNotConfiguredError,
-    PayCoreRequestError,
-    create_payment_invoice,
-)
 
 
 def _configure_logging() -> None:
@@ -66,6 +36,45 @@ _configure_logging()
 
 logging.captureWarnings(True)
 logger = logging.getLogger(__name__)
+
+logger.info("Загрузка зависимостей (aiogram)…")
+
+try:
+    from aiogram import Bot, Dispatcher, F
+    from aiogram.client.default import DefaultBotProperties
+    from aiogram.exceptions import TelegramAPIError, TelegramNetworkError
+    from aiogram.filters import Command
+    from aiogram.fsm.context import FSMContext
+    from aiogram.fsm.state import State, StatesGroup
+    from aiogram.fsm.storage.memory import MemoryStorage
+    from aiogram.types import CallbackQuery, FSInputFile, Message
+except ImportError:
+    logger.exception(
+        "Не удалось импортировать aiogram. На сервере выполнен ли pip install -r requirements.txt?",
+    )
+    raise
+
+from bot.keyboards import (  # noqa: E402
+    inline_pay_url,
+    inline_product_list,
+    inline_root_menu,
+    reply_cancel_only,
+    reply_main_menu,
+)
+from shared.catalog import (  # noqa: E402
+    OTHER_GAMES,
+    PUBG_UC_PRODUCTS,
+    TELEGRAM_GOODS,
+    VPN_SERVICE,
+    get_product,
+)
+from shared.config import get_settings  # noqa: E402
+from shared.paycore import (  # noqa: E402
+    PayCoreNotConfiguredError,
+    PayCoreRequestError,
+    create_payment_invoice,
+)
+
 
 BRAND = "Wixyeez UC Shop"
 BANNER_PATH = ROOT / "assets" / "banner.png"
@@ -349,9 +358,9 @@ async def main() -> None:
 
     settings = get_settings()
     if not settings.telegram_bot_token.strip():
-        logger.error("TELEGRAM_BOT_TOKEN пустой.")
+        logger.error("Токен бота пустой.")
         logger.error(
-            "Задайте TELEGRAM_BOT_TOKEN в окружении или файл TELEGRAM_BOT_TOKEN_FILE (Docker secrets).",
+            "Задайте TELEGRAM_BOT_TOKEN или BOT_TOKEN (Bothost), либо *_TOKEN_FILE.",
         )
         raise SystemExit(1)
 
