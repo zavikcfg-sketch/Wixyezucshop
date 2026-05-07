@@ -7,10 +7,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 
 from aiogram import Bot, Dispatcher, F
+from aiogram.exceptions import TelegramAPIError, TelegramNetworkError
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -43,7 +45,26 @@ from shared.paycore import (  # noqa: E402
     create_payment_invoice,
 )
 
-logging.basicConfig(level=logging.INFO)
+
+def _configure_logging() -> None:
+    level_name = os.environ.get("LOG_LEVEL", "INFO").upper()
+    level = getattr(logging, level_name, logging.INFO)
+    stderr = logging.StreamHandler(sys.stderr)
+    stderr.setFormatter(
+        logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        ),
+    )
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(stderr)
+    root.setLevel(level)
+
+
+_configure_logging()
+
+logging.captureWarnings(True)
 logger = logging.getLogger(__name__)
 
 BRAND = "Wixyeez UC Shop"
@@ -100,6 +121,11 @@ async def send_welcome(bot: Bot, chat_id: int) -> None:
 def register_handlers(dp: Dispatcher, settings) -> None:
     @dp.message(Command("start"))
     async def cmd_start(message: Message) -> None:
+        logger.info(
+            "/start from user_id=%s chat_id=%s",
+            message.from_user.id if message.from_user else None,
+            message.chat.id,
+        )
         payload = ""
         if message.text and len(message.text.split(maxsplit=1)) > 1:
             payload = message.text.split(maxsplit=1)[1].strip()
@@ -317,11 +343,17 @@ def register_handlers(dp: Dispatcher, settings) -> None:
 
 
 async def main() -> None:
+    logger.info("Корень проекта: %s", ROOT)
+    logger.info("Рабочая директория: %s", Path.cwd())
+    logger.info("PYTHONUNBUFFERED=%r", os.environ.get("PYTHONUNBUFFERED"))
+
     settings = get_settings()
-    if not settings.telegram_bot_token:
-        raise SystemExit(
-            "Укажите TELEGRAM_BOT_TOKEN в .env",
+    if not settings.telegram_bot_token.strip():
+        logger.error("TELEGRAM_BOT_TOKEN пустой.")
+        logger.error(
+            "Задайте TELEGRAM_BOT_TOKEN в окружении или файл TELEGRAM_BOT_TOKEN_FILE (Docker secrets).",
         )
+        raise SystemExit(1)
 
     bot = Bot(
         token=settings.telegram_bot_token,
@@ -330,9 +362,36 @@ async def main() -> None:
     dp = Dispatcher(storage=MemoryStorage())
     register_handlers(dp, settings)
 
-    logger.info("Бот запущен: %s", BRAND)
-    await dp.start_polling(bot)
+    try:
+        me = await bot.get_me()
+        logger.info(
+            "Токен валиден: @%s (id=%s)",
+            me.username or "без username",
+            me.id,
+        )
+        wh = await bot.get_webhook_info()
+        if wh.url:
+            logger.warning(
+                "У бота настроен webhook %s — long polling не получит апдейты. Сбрасываю webhook.",
+                wh.url,
+            )
+        await bot.delete_webhook(drop_pending_updates=False)
+        logger.info("Polling стартует для %s", BRAND)
+        await dp.start_polling(bot)
+    except TelegramNetworkError:
+        logger.exception(
+            "Нет сети до api.telegram.org (проверьте DNS, firewall, прокси в контейнере).",
+        )
+        raise SystemExit(1) from None
+    except TelegramAPIError:
+        logger.exception(
+            "Ошибка Telegram API (часто неверный TELEGRAM_BOT_TOKEN).",
+        )
+        raise SystemExit(1) from None
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Остановка (Ctrl+C).")
