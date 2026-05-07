@@ -2,7 +2,7 @@ import warnings
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import model_validator
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -19,8 +19,17 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    telegram_bot_token: str = ""
-    telegram_bot_token_file: str = ""
+    telegram_bot_token: str = Field(
+        default="",
+        validation_alias=AliasChoices("TELEGRAM_BOT_TOKEN", "BOT_TOKEN"),
+    )
+    telegram_bot_token_file: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "TELEGRAM_BOT_TOKEN_FILE",
+            "BOT_TOKEN_FILE",
+        ),
+    )
     paycore_api_base_url: str = ""
     paycore_public_key: str = ""
     paycore_payment_service: str = ""
@@ -41,7 +50,7 @@ class Settings(BaseSettings):
         fp = Path(path)
         if not fp.is_file():
             warnings.warn(
-                f"TELEGRAM_BOT_TOKEN_FILE указан, но файл не найден: {path}",
+                f"Файл токена указан (TELEGRAM_BOT_TOKEN_FILE / BOT_TOKEN_FILE), но не найден: {path}",
                 stacklevel=1,
             )
             return self
