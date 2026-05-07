@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 from aiogram import Bot, Dispatcher, F
+from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -323,8 +324,8 @@ async def main() -> None:
         )
 
     bot = Bot(
-        settings.telegram_bot_token,
-        parse_mode="HTML",
+        token=settings.telegram_bot_token,
+        default=DefaultBotProperties(parse_mode="HTML"),
     )
     dp = Dispatcher(storage=MemoryStorage())
     register_handlers(dp, settings)
