@@ -1,10 +1,17 @@
+/**
+ * Клиентский скрипт сайта (браузер). Не запускайте через `node app.js` —
+ * отдавайте файл как статику вместе с index.html (например через uvicorn/FastAPI server.py).
+ */
 const state = {
   catalog: null,
   meta: null,
   sel: null,
 };
 
-const $ = (s, r = document) => r.querySelector(s);
+function $(s, root) {
+  if (typeof document === "undefined") return null;
+  return (root ?? document).querySelector(s);
+}
 
 function money(p) {
   if (Number(p.amount) <= 0) return "Скоро";
@@ -15,6 +22,7 @@ function money(p) {
 }
 
 function renderGrid(el, items) {
+  if (!el || typeof document === "undefined") return;
   el.innerHTML = "";
   items.forEach((p) => {
     const avail = Number(p.amount) > 0;
@@ -66,20 +74,29 @@ function chipsForFeatured(items, max = 4) {
 
 function openModal(product) {
   if (!product || Number(product.amount) <= 0) return;
+  const modalTitle = $("#modalTitle");
+  if (!modalTitle) return;
   state.sel = product;
-  $("#modalTitle").textContent = product.title;
-  $("#modalSub").textContent = `${money(product)} · ${product.description}`;
-  $("#acctLabel").textContent = product.account_label || "Учётные данные";
-  $("#acctInput").value = "";
-  $("#modalErr").textContent = "";
-  $("#modal").classList.remove("hidden");
-  $("#modal").setAttribute("aria-hidden", "false");
-  $("#acctInput").focus();
+  modalTitle.textContent = product.title;
+  const sub = $("#modalSub");
+  if (sub) sub.textContent = `${money(product)} · ${product.description}`;
+  const lbl = $("#acctLabel");
+  if (lbl) lbl.textContent = product.account_label || "Учётные данные";
+  const input = $("#acctInput");
+  if (input) input.value = "";
+  const err = $("#modalErr");
+  if (err) err.textContent = "";
+  const modal = $("#modal");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+  }
+  $("#acctInput")?.focus();
 }
 
 function closeModal() {
-  $("#modal").classList.add("hidden");
-  $("#modal").setAttribute("aria-hidden", "true");
+  $("#modal")?.classList.add("hidden");
+  $("#modal")?.setAttribute("aria-hidden", "true");
   state.sel = null;
 }
 
@@ -95,7 +112,7 @@ async function bootstrap() {
 
   const tg = state.meta.telegram_bot_username;
   const botRow = $("#botLinkRow");
-  if (tg) {
+  if (tg && botRow) {
     const a = document.createElement("a");
     a.className = "telegram-link";
     a.href = `https://t.me/${tg}`;
@@ -106,46 +123,61 @@ async function bootstrap() {
   }
 
   const c = state.catalog;
-  $("#featuredPubg").innerHTML = chipsForFeatured(c.pubg || []);
+  const fp = $("#featuredPubg");
+  if (fp) fp.innerHTML = chipsForFeatured(c.pubg || []);
   renderGrid($("#gridPubg"), c.pubg || []);
   renderGrid($("#gridTelegram"), c.telegram || []);
   renderGrid($("#gridGames"), c.games || []);
   renderGrid($("#gridVpn"), c.vpn || []);
 }
 
-$("#backdrop").addEventListener("click", closeModal);
-$("#closeBtn").addEventListener("click", closeModal);
-$("#payBtn").addEventListener("click", async () => {
-  const p = state.sel;
-  if (!p) return;
-  const account = $("#acctInput").value.trim();
-  if (account.length < 3) {
-    $("#modalErr").textContent = "Введите корректные данные аккаунта.";
+function init() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
-  $("#modalErr").textContent = "";
-  $("#payBtn").disabled = true;
-  try {
-    const r = await fetch("/api/create-invoice", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_id: p.id, account }),
-    });
-    const js = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      const d = typeof js.detail === "string" ? js.detail : JSON.stringify(js.detail || js);
-      $("#modalErr").textContent =
-        r.status === 503
-          ? `PayCore: ${d}`
-          : `Ошибка: ${d}`;
+
+  $("#backdrop")?.addEventListener("click", closeModal);
+  $("#closeBtn")?.addEventListener("click", closeModal);
+  $("#payBtn")?.addEventListener("click", async () => {
+    const p = state.sel;
+    if (!p) return;
+    const accountEl = $("#acctInput");
+    const account = accountEl ? accountEl.value.trim() : "";
+    if (account.length < 3) {
+      const errEl = $("#modalErr");
+      if (errEl) errEl.textContent = "Введите корректные данные аккаунта.";
       return;
     }
-    window.location.href = js.checkout_url;
-  } catch (e) {
-    $("#modalErr").textContent = "Сеть или сервер недоступны.";
-  } finally {
-    $("#payBtn").disabled = false;
-  }
-});
+    const errEl = $("#modalErr");
+    if (errEl) errEl.textContent = "";
+    const payBtn = $("#payBtn");
+    if (payBtn) payBtn.disabled = true;
+    try {
+      const r = await fetch("/api/create-invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id: p.id, account }),
+      });
+      const js = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const d = typeof js.detail === "string" ? js.detail : JSON.stringify(js.detail || js);
+        if (errEl) {
+          errEl.textContent =
+            r.status === 503
+              ? `PayCore: ${d}`
+              : `Ошибка: ${d}`;
+        }
+        return;
+      }
+      window.location.href = js.checkout_url;
+    } catch (_e) {
+      if (errEl) errEl.textContent = "Сеть или сервер недоступны.";
+    } finally {
+      if (payBtn) payBtn.disabled = false;
+    }
+  });
 
-bootstrap();
+  bootstrap();
+}
+
+init();
