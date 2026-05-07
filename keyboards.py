@@ -52,10 +52,6 @@ def inline_root_menu() -> InlineKeyboardMarkup:
 
 
 def inline_product_list(items: list[tuple[str, str]]) -> InlineKeyboardMarkup:
-    """
-    items: list of (callback_pick_id_suffix, button_label)
-    callback: pick_<product_id>
-    """
     rows: list[list[InlineKeyboardButton]] = []
     row: list[InlineKeyboardButton] = []
     for product_id, label in items:

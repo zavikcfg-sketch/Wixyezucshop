@@ -1,6 +1,7 @@
 """
-Wixyeez UC Shop — Telegram-бот. Запуск из корня проекта:
-  python -m bot.main
+Wixyeez UC Shop — Telegram-бот (всё в корне проекта).
+
+Запуск: python main.py
 """
 
 from __future__ import annotations
@@ -9,11 +10,16 @@ import asyncio
 import logging
 import os
 import sys
+import traceback
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+
+def _stderr(msg: str) -> None:
+    print(msg, file=sys.stderr, flush=True)
 
 
 def _configure_logging() -> None:
@@ -54,7 +60,7 @@ except ImportError:
     )
     raise
 
-from bot.keyboards import (  # noqa: E402
+from keyboards import (  # noqa: E402
     inline_pay_url,
     inline_product_list,
     inline_root_menu,
@@ -74,7 +80,6 @@ from shared.paycore import (  # noqa: E402
     PayCoreRequestError,
     create_payment_invoice,
 )
-
 
 BRAND = "Wixyeez UC Shop"
 BANNER_PATH = ROOT / "assets" / "banner.png"
@@ -351,7 +356,7 @@ def register_handlers(dp: Dispatcher, settings) -> None:
             )
 
 
-async def main() -> None:
+async def run_bot() -> None:
     logger.info("Корень проекта: %s", ROOT)
     logger.info("Рабочая директория: %s", Path.cwd())
     logger.info("PYTHONUNBUFFERED=%r", os.environ.get("PYTHONUNBUFFERED"))
@@ -364,7 +369,7 @@ async def main() -> None:
         )
         raise SystemExit(1)
 
-    bot = Bot(
+    tg_bot = Bot(
         token=settings.telegram_bot_token,
         default=DefaultBotProperties(parse_mode="HTML"),
     )
@@ -372,21 +377,21 @@ async def main() -> None:
     register_handlers(dp, settings)
 
     try:
-        me = await bot.get_me()
+        me = await tg_bot.get_me()
         logger.info(
             "Токен валиден: @%s (id=%s)",
             me.username or "без username",
             me.id,
         )
-        wh = await bot.get_webhook_info()
+        wh = await tg_bot.get_webhook_info()
         if wh.url:
             logger.warning(
                 "У бота настроен webhook %s — long polling не получит апдейты. Сбрасываю webhook.",
                 wh.url,
             )
-        await bot.delete_webhook(drop_pending_updates=False)
+        await tg_bot.delete_webhook(drop_pending_updates=False)
         logger.info("Polling стартует для %s", BRAND)
-        await dp.start_polling(bot)
+        await dp.start_polling(tg_bot)
     except TelegramNetworkError:
         logger.exception(
             "Нет сети до api.telegram.org (проверьте DNS, firewall, прокси в контейнере).",
@@ -399,8 +404,19 @@ async def main() -> None:
         raise SystemExit(1) from None
 
 
-if __name__ == "__main__":
+def main_cli() -> None:
+    _stderr(f"[wixyeez] repo_root={ROOT}")
+    _stderr(f"[wixyeez] cwd={Path.cwd()}")
     try:
-        asyncio.run(main())
+        asyncio.run(run_bot())
     except KeyboardInterrupt:
         logger.info("Остановка (Ctrl+C).")
+    except BaseException:
+        _stderr("[wixyeez] FATAL — трассировка ниже:")
+        traceback.print_exc(file=sys.stderr)
+        sys.stderr.flush()
+        raise
+
+
+if __name__ == "__main__":
+    main_cli()

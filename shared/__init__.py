@@ -1,1 +1,1 @@
-# Shared package for bot + web
+# Shared: конфиг, каталог, PayCore (сайт server.py и бот main.py).
