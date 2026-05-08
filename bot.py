@@ -10,7 +10,7 @@ from decimal import Decimal
 import aiohttp
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.filters import Command, CommandStart
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
+from aiogram.types import CallbackQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup, Message
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,6 +20,7 @@ ADMIN_ID = os.getenv("ADMIN_ID", "").strip()
 WEBSITE_URL = os.getenv("WEBSITE_URL", "https://example.com").strip()
 SUPPORT_URL = os.getenv("SUPPORT_URL", "https://t.me/").strip()
 BOT_PUBLIC_URL = os.getenv("BOT_PUBLIC_URL", "https://t.me/").strip()
+BANNER_PATH = os.getenv("BANNER_PATH", "assets/telegram-preview-1.png").strip()
 
 PAYCORE_API_URL = os.getenv("PAYCORE_API_URL", "https://api.paycore.io").strip()
 PAYCORE_TOKEN = os.getenv("PAYCORE_TOKEN", "").strip()
@@ -75,13 +76,13 @@ def init_db() -> None:
 def main_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🎮 PUBG MOBILE", callback_data="menu:pubg")],
-            [InlineKeyboardButton(text="📩 Telegram товары", callback_data="menu:telegram")],
-            [InlineKeyboardButton(text="🕹 ВСЕ ИГРЫ", callback_data="menu:all_games")],
-            [InlineKeyboardButton(text="ℹ️ ПРОЧАЯ ИНФОРМАЦИЯ", callback_data="menu:info")],
-            [InlineKeyboardButton(text="🎁 Розыгрыш 5000₽", callback_data="menu:giveaway")],
-            [InlineKeyboardButton(text="👤 Профиль", callback_data="menu:profile")],
-            [InlineKeyboardButton(text="🌐 Сайт Wixyeez Shop", url=WEBSITE_URL)],
+            [InlineKeyboardButton(text="🟩 PUBG MOBILE", callback_data="menu:pubg")],
+            [InlineKeyboardButton(text="🟦 Telegram товары", callback_data="menu:telegram")],
+            [InlineKeyboardButton(text="🟪 ВСЕ ИГРЫ", callback_data="menu:all_games")],
+            [InlineKeyboardButton(text="🟦 ПРОЧАЯ ИНФОРМАЦИЯ", callback_data="menu:info")],
+            [InlineKeyboardButton(text="🟧 Розыгрыш 5000₽", callback_data="menu:giveaway")],
+            [InlineKeyboardButton(text="🟩 Профиль", callback_data="menu:profile")],
+            [InlineKeyboardButton(text="🟪 Сайт Wixyeez Shop", url=WEBSITE_URL)],
         ]
     )
 
@@ -233,7 +234,14 @@ async def start(message: Message):
         "Быстрая выдача после оплаты через PayCore.\n\n"
         "Выберите раздел ниже:"
     )
-    await message.answer(text, reply_markup=main_menu_keyboard())
+    if os.path.exists(BANNER_PATH):
+        await message.answer_photo(
+            photo=FSInputFile(BANNER_PATH),
+            caption=text,
+            reply_markup=main_menu_keyboard(),
+        )
+    else:
+        await message.answer(text, reply_markup=main_menu_keyboard())
 
 
 @router.callback_query(F.data == "menu:main")

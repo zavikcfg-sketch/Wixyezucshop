@@ -58,8 +58,7 @@ body {
   background:
     linear-gradient(180deg, rgba(6, 6, 14, 0.25), rgba(6, 6, 14, 0.8)),
     radial-gradient(circle at 15% 10%, rgba(105, 54, 255, 0.4), transparent 45%),
-    url("https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1700&q=80")
-      center / cover no-repeat;
+    url("../assets/telegram-preview-1.png") center / cover no-repeat;
   filter: saturate(120%) blur(1px);
 }
 
@@ -93,6 +92,14 @@ body {
   padding: 18px;
   backdrop-filter: blur(10px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.promo__image {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .promo__top {
@@ -133,7 +140,7 @@ body {
 .game-card {
   text-decoration: none;
   color: #d5e8ff;
-  background: var(--card);
+  background: linear-gradient(180deg, rgba(35, 53, 90, 0.8), var(--card));
   border: 1px solid var(--border);
   border-radius: 14px;
   min-height: 84px;
@@ -141,6 +148,22 @@ body {
   place-items: center;
   font-weight: 700;
   transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.game-card:nth-child(1) {
+  background: linear-gradient(180deg, rgba(51, 171, 255, 0.45), rgba(26, 36, 74, 0.88));
+}
+
+.game-card:nth-child(2) {
+  background: linear-gradient(180deg, rgba(160, 110, 255, 0.45), rgba(32, 24, 72, 0.9));
+}
+
+.game-card:nth-child(3) {
+  background: linear-gradient(180deg, rgba(83, 223, 255, 0.45), rgba(19, 38, 70, 0.88));
+}
+
+.game-card:nth-child(4) {
+  background: linear-gradient(180deg, rgba(123, 152, 255, 0.45), rgba(25, 33, 66, 0.9));
 }
 
 .game-card:hover {
