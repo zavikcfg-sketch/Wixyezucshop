@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIXYEZ UC SHOP</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: #0f0f13;
+      font-family: "Inter", "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    .bg-depth::before,
+    .bg-depth::after {
+      content: "";
+      position: fixed;
+      width: 26rem;
+      height: 26rem;
+      border-radius: 9999px;
+      filter: blur(70px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .bg-depth::before {
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.65) 0%, rgba(15, 15, 19, 0) 70%);
+      top: -5rem;
+      right: -6rem;
+    }
+
+    .bg-depth::after {
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(15, 15, 19, 0) 70%);
+      bottom: -7rem;
+      left: -5rem;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeIn 700ms ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="text-white bg-depth">
+  <main class="fade-in min-h-screen px-4 py-6 max-w-xl mx-auto">
+    <!-- Header banner -->
+    <section class="rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-md p-4 shadow-[0_0_30px_rgba(139,92,246,0.15)]">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-purple-300/80">Featured</p>
+          <h1 class="text-lg font-bold mt-1">Genshin Impact</h1>
+          <p class="text-sm text-purple-100/70">Популярные пополнения и наборы</p>
+        </div>
+        <button
+          type="button"
+          class="shrink-0 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 transition-all font-semibold"
+          aria-label="Перейти к Genshin Impact"
+        >
+          Перейти
+        </button>
+      </div>
+    </section>
+
+    <!-- Logo/title -->
+    <section class="mt-6 text-center">
+      <h2 class="text-2xl sm:text-3xl font-black tracking-wide bg-gradient-to-r from-purple-300 via-purple-500 to-fuchsia-400 bg-clip-text text-transparent">
+        WIXYEZ SHOP BOT
+      </h2>
+      <p class="text-sm text-purple-200/70 mt-2">Каталог игровых сервисов</p>
+    </section>
+
+    <!-- 2-column game grid -->
+    <section id="gameGrid" class="mt-6 grid grid-cols-2 gap-4">
+      <article data-game="PUBG Mobile" class="game-card group aspect-square rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-md p-4 flex flex-col justify-between transition hover:border-purple-400/60 hover:shadow-[0_0_18px_rgba(168,85,247,0.35)] cursor-pointer">
+        <div class="text-4xl select-none">🎯</div>
+        <h3 class="text-sm sm:text-base font-semibold text-purple-100">PUBG Mobile</h3>
+      </article>
+
+      <article data-game="Steam" class="game-card group aspect-square rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-md p-4 flex flex-col justify-between transition hover:border-purple-400/60 hover:shadow-[0_0_18px_rgba(168,85,247,0.35)] cursor-pointer">
+        <div class="text-4xl select-none">🧩</div>
+        <h3 class="text-sm sm:text-base font-semibold text-purple-100">Steam</h3>
+      </article>
+
+      <article data-game="Brawl Stars" class="game-card group aspect-square rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-md p-4 flex flex-col justify-between transition hover:border-purple-400/60 hover:shadow-[0_0_18px_rgba(168,85,247,0.35)] cursor-pointer">
+        <div class="text-4xl select-none">⭐</div>
+        <h3 class="text-sm sm:text-base font-semibold text-purple-100">Brawl Stars</h3>
+      </article>
+
+      <article data-game="Clash of Clans" class="game-card group aspect-square rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-md p-4 flex flex-col justify-between transition hover:border-purple-400/60 hover:shadow-[0_0_18px_rgba(168,85,247,0.35)] cursor-pointer">
+        <div class="text-4xl select-none">🏰</div>
+        <h3 class="text-sm sm:text-base font-semibold text-purple-100">Clash of Clans</h3>
+      </article>
+    </section>
+
+    <section class="mt-6 rounded-2xl border border-purple-500/30 bg-white/10 backdrop-blur-md p-4">
+      <p class="text-xs uppercase tracking-widest text-purple-300/80">Оформление заказа</p>
+      <p id="selectedGame" class="mt-2 text-sm text-purple-100">Выбрано: PUBG Mobile</p>
+      <textarea
+        id="details"
+        class="mt-3 w-full rounded-xl border border-purple-500/30 bg-black/20 px-3 py-2 text-sm outline-none focus:border-purple-400"
+        rows="3"
+        placeholder="ID аккаунта / количество / комментарий"
+      ></textarea>
+      <button
+        id="sendOrder"
+        type="button"
+        class="mt-3 w-full rounded-xl bg-purple-600 py-2 font-semibold transition hover:bg-purple-500 active:scale-[0.99]"
+      >
+        Отправить заказ в бот
+      </button>
+    </section>
+  </main>
+
+  <script>
+    // Telegram Mini App initialization
+    let selectedGame = "PUBG Mobile";
+
+    const selectedGameEl = document.getElementById("selectedGame");
+    const detailsEl = document.getElementById("details");
+    const sendOrderBtn = document.getElementById("sendOrder");
+    const gameCards = document.querySelectorAll(".game-card");
+
+    gameCards.forEach((card, idx) => {
+      if (idx === 0) {
+        card.classList.add("border-purple-400", "shadow-[0_0_18px_rgba(168,85,247,0.35)]");
+      }
+      card.addEventListener("click", () => {
+        gameCards.forEach((c) => c.classList.remove("border-purple-400", "shadow-[0_0_18px_rgba(168,85,247,0.35)]"));
+        card.classList.add("border-purple-400", "shadow-[0_0_18px_rgba(168,85,247,0.35)]");
+        selectedGame = card.dataset.game || "PUBG Mobile";
+        selectedGameEl.textContent = `Выбрано: ${selectedGame}`;
+      });
+    });
+
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+
+      sendOrderBtn.addEventListener("click", () => {
+        const payload = {
+          action: "create_order",
+          game: selectedGame,
+          details: detailsEl.value.trim(),
+        };
+        tg.sendData(JSON.stringify(payload));
+        tg.HapticFeedback.notificationOccurred("success");
+      });
+    } else {
+      sendOrderBtn.addEventListener("click", () => {
+        alert("Эта кнопка работает внутри Telegram Web App.");
+      });
+    }
+  </script>
+</body>
+</html>
