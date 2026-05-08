@@ -1,46 +1,84 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wixyeez UC Shop</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="container topbar__inner">
-        <strong>WIXYEEZ SHOP BOT 24/7</strong>
-        <span>Автоматическая выдача</span>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIXYEZ Metro Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="bg-orbs"></div>
+  <div class="top-bar">
+    <span class="shield">🛡️</span>
+    <span>Свободный и безопасный интернет для геймеров</span>
+  </div>
 
-    <main class="hero">
-      <div class="hero__backdrop"></div>
-      <div class="hero__brand">WIXYEEZ SHOP BOT</div>
+  <header class="site-header">
+    <div class="logo-ring">
+      <div class="logo-inner">WZ</div>
+    </div>
+    <div class="header-text">
+      <h1>WIXYEZ Metro Shop</h1>
+      <p class="tag">Shop bot · игровая валюта · 24/7</p>
+      <div class="header-meta" id="botLinkRow"></div>
+    </div>
+    <div class="trust-pills">
+      <div class="pill pill-safe">★★★★★<br /><span>Безопасно</span></div>
+      <div class="pill pill-fast"><span>Оперативно</span></div>
+    </div>
+  </header>
 
-      <section class="showcase container">
-        <article class="promo">
-          <img class="promo__image" src="../assets/telegram-preview-2.png" alt="Wixyeez preview" />
-          <p class="promo__top">Свободный и безопасный интернет</p>
-          <h1>ТОВАРЫ<br />GENSHIN IMPACT</h1>
-          <a href="https://t.me/your_bot" target="_blank" rel="noreferrer">Перейти</a>
-        </article>
-
-        <div class="grid-title">ДРУГИЕ ИГРЫ И СЕРВИСЫ</div>
-        <div class="game-grid" id="catalog">
-          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">PUBG Mobile</a>
-          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Steam</a>
-          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Brawl Stars</a>
-          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Clash of Clans</a>
+  <main>
+    <section class="featured">
+      <div class="card hero-card">
+        <div class="hero-badge">Featured</div>
+        <div class="hero-copy">
+          <h2>Товары PUBG Mobile UC</h2>
+          <p class="muted">Пополнение UC по Player ID с быстрым оформлением заявки</p>
+          <div id="featuredPubg" class="mini-list"></div>
+          <a class="btn glow" href="#pubg-scroll">Выбрать пакет</a>
         </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="container footer__inner">
-        <p>© Wixyeez UC Shop</p>
-        <a href="https://t.me/your_support" target="_blank" rel="noreferrer">Поддержка</a>
       </div>
+    </section>
+
+    <section class="catalog" id="pubg-scroll">
+      <h2 class="section-title">PUBG Mobile</h2>
+      <div class="product-grid" id="gridPubg"></div>
+
+      <h2 class="section-title">Telegram товары</h2>
+      <div class="product-grid" id="gridTelegram"></div>
+
+      <h2 class="section-title">Другие игры и сервисы</h2>
+      <div class="product-grid" id="gridGames"></div>
+
+      <h2 class="section-title">Интернет без ограничений</h2>
+      <div class="product-grid" id="gridVpn"></div>
+    </section>
+
+    <footer class="site-footer">
+      <span>© WIXYEZ Metro Shop</span>
+      <span>Оформление: через Telegram-бот</span>
     </footer>
-  </body>
-  </html>
+  </main>
+
+  <div class="modal hidden" id="modal" aria-hidden="true">
+    <div class="modal-backdrop" id="backdrop"></div>
+    <div class="modal-sheet">
+      <button class="icon-close" type="button" id="closeBtn" aria-label="Закрыть">✕</button>
+      <h3 id="modalTitle">Заказ</h3>
+      <p class="muted" id="modalSub"></p>
+      <label class="fld">
+        <span id="acctLabel"></span>
+        <input type="text" id="acctInput" autocomplete="off" />
+      </label>
+      <button class="btn full" type="button" id="payBtn">Перейти в Telegram</button>
+      <p class="muted small" id="modalErr"></p>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
