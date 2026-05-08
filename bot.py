@@ -75,11 +75,12 @@ def init_db() -> None:
 def main_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="🟣 PUBG MOBILE UC", callback_data="menu:pubg")],
-            [InlineKeyboardButton(text="🟣 Genshin Impact", callback_data="menu:genshin")],
-            [InlineKeyboardButton(text="🟣 Steam Wallet", callback_data="menu:steam")],
+            [InlineKeyboardButton(text="🎮 PUBG MOBILE", callback_data="menu:pubg")],
+            [InlineKeyboardButton(text="📩 Telegram товары", callback_data="menu:telegram")],
+            [InlineKeyboardButton(text="🕹 ВСЕ ИГРЫ", callback_data="menu:all_games")],
+            [InlineKeyboardButton(text="ℹ️ ПРОЧАЯ ИНФОРМАЦИЯ", callback_data="menu:info")],
+            [InlineKeyboardButton(text="🎁 Розыгрыш 5000₽", callback_data="menu:giveaway")],
             [InlineKeyboardButton(text="👤 Профиль", callback_data="menu:profile")],
-            [InlineKeyboardButton(text="🆘 Поддержка", url=SUPPORT_URL)],
             [InlineKeyboardButton(text="🌐 Сайт Wixyeez Shop", url=WEBSITE_URL)],
         ]
     )
@@ -227,16 +228,17 @@ async def is_paid(invoice_id: str) -> bool:
 @router.message(CommandStart())
 async def start(message: Message):
     text = (
-        "🖤💜 Добро пожаловать в Wixyeez UC Shop Bot\n\n"
-        "Работаем 24/7 и выдаем заказы автоматически.\n"
-        "Выберите игру и нужный пакет ниже."
+        "🚨 ДОБРО ПОЖАЛОВАТЬ В WIXYEEZ SHOP BOT 🧾\n\n"
+        "МЫ РАБОТАЕМ НЕПРЕРЫВНО - 24/7 ✅\n"
+        "Быстрая выдача после оплаты через PayCore.\n\n"
+        "Выберите раздел ниже:"
     )
     await message.answer(text, reply_markup=main_menu_keyboard())
 
 
 @router.callback_query(F.data == "menu:main")
 async def menu_main(callback: CallbackQuery):
-    await callback.message.edit_text("🏠 Главное меню Wixyeez UC Shop", reply_markup=main_menu_keyboard())
+    await callback.message.edit_text("🏠 ГЛАВНОЕ МЕНЮ WIXYEEZ SHOP", reply_markup=main_menu_keyboard())
     await callback.answer()
 
 
@@ -256,19 +258,69 @@ async def menu_profile(callback: CallbackQuery):
 
 @router.callback_query(F.data == "menu:pubg")
 async def menu_pubg(callback: CallbackQuery):
-    await callback.message.edit_text("🟣 PUBG MOBILE UC", reply_markup=products_keyboard("pubg"))
+    await callback.message.edit_text("🎮 PUBG MOBILE UC", reply_markup=products_keyboard("pubg"))
     await callback.answer()
 
 
 @router.callback_query(F.data == "menu:genshin")
 async def menu_genshin(callback: CallbackQuery):
-    await callback.message.edit_text("🟣 Genshin Impact", reply_markup=products_keyboard("genshin"))
+    await callback.message.edit_text("💎 Genshin Impact", reply_markup=products_keyboard("genshin"))
     await callback.answer()
 
 
 @router.callback_query(F.data == "menu:steam")
 async def menu_steam(callback: CallbackQuery):
-    await callback.message.edit_text("🟣 Steam Wallet", reply_markup=products_keyboard("steam"))
+    await callback.message.edit_text("💠 Steam Wallet", reply_markup=products_keyboard("steam"))
+    await callback.answer()
+
+
+@router.callback_query(F.data == "menu:telegram")
+async def menu_telegram(callback: CallbackQuery):
+    await callback.message.edit_text("📩 TELEGRAM ТОВАРЫ", reply_markup=products_keyboard("steam"))
+    await callback.answer()
+
+
+@router.callback_query(F.data == "menu:all_games")
+async def menu_all_games(callback: CallbackQuery):
+    await callback.message.edit_text(
+        "🕹 ВСЕ ИГРЫ\n\nВыберите категорию:",
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="🎮 PUBG MOBILE", callback_data="menu:pubg")],
+                [InlineKeyboardButton(text="💎 Genshin Impact", callback_data="menu:genshin")],
+                [InlineKeyboardButton(text="💠 Steam Wallet", callback_data="menu:steam")],
+                [InlineKeyboardButton(text="⬅️ Назад в меню", callback_data="menu:main")],
+            ]
+        ),
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "menu:info")
+async def menu_info(callback: CallbackQuery):
+    text = (
+        "ℹ️ ПРОЧАЯ ИНФОРМАЦИЯ\n\n"
+        "• Автовыдача 24/7\n"
+        "• Безопасная оплата PayCore\n"
+        "• Поддержка отвечает быстро\n\n"
+        f"Поддержка: {SUPPORT_URL}\n"
+        f"Сайт: {WEBSITE_URL}"
+    )
+    await callback.message.edit_text(text, reply_markup=main_menu_keyboard())
+    await callback.answer()
+
+
+@router.callback_query(F.data == "menu:giveaway")
+async def menu_giveaway(callback: CallbackQuery):
+    text = (
+        "🎁 РОЗЫГРЫШ 5000₽\n\n"
+        "Чтобы участвовать:\n"
+        "1) Сделайте любую покупку в боте\n"
+        "2) Оставьте отзыв в поддержку\n"
+        "3) Дождитесь объявления победителя\n\n"
+        "Победитель выбирается случайно."
+    )
+    await callback.message.edit_text(text, reply_markup=main_menu_keyboard())
     await callback.answer()
 
 

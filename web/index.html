@@ -7,71 +7,30 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <div class="container">
-        <p class="hero__tag">WIXYEEZ SHOP BOT 24/7</p>
-        <h1>Wixyeez UC Shop</h1>
-        <p class="hero__subtitle">
-          Безопасное пополнение PUBG Mobile UC, Genshin Impact и Steam Wallet.
-        </p>
-        <div class="hero__actions">
-          <a class="btn btn--primary" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Открыть Telegram Bot</a>
-          <a class="btn btn--ghost" href="#catalog">Смотреть каталог</a>
-        </div>
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <strong>WIXYEEZ SHOP BOT 24/7</strong>
+        <span>Автоматическая выдача</span>
       </div>
     </header>
 
-    <main>
-      <section class="section container" id="catalog">
-        <h2>Каталог</h2>
-        <p class="lead">Черно-фиолетовый фирменный стиль Wixyeez, быстрые заказы и 24/7 поддержка.</p>
+    <main class="hero">
+      <div class="hero__backdrop"></div>
+      <div class="hero__brand">WIXYEEZ SHOP BOT</div>
 
-        <div class="cards">
-          <article class="card">
-            <h3>PUBG MOBILE UC</h3>
-            <ul>
-              <li>60 UC — 149 RUB</li>
-              <li>325 UC — 649 RUB</li>
-              <li>660 UC — 1249 RUB</li>
-              <li>1800 UC — 3090 RUB</li>
-            </ul>
-          </article>
+      <section class="showcase container">
+        <article class="promo">
+          <p class="promo__top">Свободный и безопасный интернет</p>
+          <h1>ТОВАРЫ<br />GENSHIN IMPACT</h1>
+          <a href="https://t.me/your_bot" target="_blank" rel="noreferrer">Перейти</a>
+        </article>
 
-          <article class="card">
-            <h3>Genshin Impact</h3>
-            <ul>
-              <li>300 Crystals — 399 RUB</li>
-              <li>980 Crystals — 1190 RUB</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Steam Wallet</h3>
-            <ul>
-              <li>500 RUB top-up — 539 RUB</li>
-              <li>1000 RUB top-up — 1049 RUB</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="section section--alt">
-        <div class="container">
-          <h2>Как это работает</h2>
-          <div class="steps">
-            <div class="step">
-              <span>01</span>
-              <p>Выберите товар в Telegram-боте.</p>
-            </div>
-            <div class="step">
-              <span>02</span>
-              <p>Оплатите заказ через PayCore.</p>
-            </div>
-            <div class="step">
-              <span>03</span>
-              <p>Получите выдачу автоматически в боте.</p>
-            </div>
-          </div>
+        <div class="grid-title">ДРУГИЕ ИГРЫ И СЕРВИСЫ</div>
+        <div class="game-grid" id="catalog">
+          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">PUBG Mobile</a>
+          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Steam</a>
+          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Brawl Stars</a>
+          <a class="game-card" href="https://t.me/your_bot" target="_blank" rel="noreferrer">Clash of Clans</a>
         </div>
       </section>
     </main>
